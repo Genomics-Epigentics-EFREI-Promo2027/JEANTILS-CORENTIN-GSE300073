@@ -1,0 +1,1648 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Analyse RNA-seq GSE300073 &mdash; EBOV / MARV organo&iuml;des</title>
+<style>
+:root{
+  --bg:#ffffff;
+  --ink:#1f2430;
+  --muted:#5b6472;
+  --accent:#1b6f8c;
+  --accent-dark:#114a5e;
+  --code-bg:#f6f8fa;
+  --code-border:#e1e6ec;
+  --out-bg:#fbfaf6;
+  --out-border:#ece4d2;
+  --comment:#7d8a99;
+  --line:#e7eaee;
+  --warn-bg:#fff8e8;
+  --warn-border:#f0d9a0;
+  --missing-bg:#fff5f5;
+  --missing-border:#e8b4b4;
+}
+*{box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{
+  margin:0;
+  background:#f3f5f7;
+  color:var(--ink);
+  font-family:"Segoe UI","Helvetica Neue",Helvetica,Arial,sans-serif;
+  line-height:1.65;
+}
+.r-page{
+  max-width:1100px;
+  margin:0 auto;
+  background:var(--bg);
+  padding:48px 64px 80px;
+  box-shadow:0 0 40px rgba(0,0,0,0.06);
+}
+@media (max-width:800px){
+  .r-page{padding:24px 18px 56px;}
+}
+
+/* ---------- Title block ---------- */
+.r-titleblock{
+  text-align:center;
+  padding-bottom:28px;
+  margin-bottom:8px;
+  border-bottom:3px solid var(--accent);
+}
+.r-titleblock h1{
+  font-size:1.85rem;
+  color:var(--accent-dark);
+  margin:0 0 10px;
+  line-height:1.3;
+}
+.r-subtitle{
+  font-size:1.05rem;
+  color:var(--ink);
+  margin:0 0 10px;
+}
+.r-meta{
+  color:var(--muted);
+  font-size:0.92rem;
+  margin:0;
+}
+
+/* ---------- TOC ---------- */
+.r-toc{
+  background:#f6f9fb;
+  border:1px solid var(--line);
+  border-radius:10px;
+  padding:20px 28px;
+  margin:32px 0 40px;
+}
+.r-toc h2{
+  margin-top:0;
+  font-size:1.05rem;
+  border:none;
+  padding:0;
+  color:var(--accent-dark);
+}
+.r-toc ol{
+  columns:2;
+  column-gap:36px;
+  padding-left:1.2em;
+  margin:0;
+}
+.r-toc li{margin-bottom:6px;}
+.r-toc a{
+  color:var(--accent);
+  display: block;
+  margin: 0.25em 0;
+  text-decoration:none;
+  font-size:0.94rem;
+}
+.r-toc a:hover{text-decoration:underline;}
+@media (max-width:700px){ .r-toc ol{columns:1;} }
+
+/* ---------- Headings ---------- */
+h2{
+  font-size:1.35rem;
+  color:var(--accent-dark);
+  border-bottom:2px solid var(--line);
+  padding-bottom:8px;
+  margin:46px 0 18px;
+  scroll-margin-top:18px;
+}
+h2:first-of-type{margin-top:24px;}
+
+/* ---------- Code blocks ---------- */
+pre{
+  margin:0 0 16px;
+  border-radius:8px;
+  overflow-x:auto;
+  font-size:0.86rem;
+  line-height:1.55;
+}
+pre code{
+  font-family:"SFMono-Regular",Consolas,"Liberation Mono",Menlo,Courier,monospace;
+  white-space:pre;
+}
+pre.r-source{
+  background:var(--code-bg);
+  border:1px solid var(--code-border);
+  border-left:4px solid var(--accent);
+  padding:14px 18px;
+  color:#24292e;
+}
+pre.r-output{
+  background:var(--out-bg);
+  border:1px solid #ece6d6;
+  border-left:4px solid #b8a35a;
+  padding:12px 18px;
+  color:#5c5440;
+  font-size:0.82rem;
+}
+.rc{
+  color:var(--comment);
+  font-style:italic;
+}
+
+/* ---------- Figures ---------- */
+.r-figure{
+  margin:22px 0 30px;
+  text-align:center;
+  background:#fafbfc;
+  border:1px solid var(--line);
+  border-radius:10px;
+  padding:18px;
+}
+.r-figure img{
+  max-width:100%;
+  height:auto;
+  border-radius:6px;
+}
+.r-figure figcaption{
+  margin-top:12px;
+  font-size:0.9rem;
+  color:var(--muted);
+  font-style:italic;
+}
+
+.r-figure-grid{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:18px;
+}
+@media (max-width:700px){ .r-figure-grid{grid-template-columns:1fr;} }
+
+.r-missing .missing-box{
+  background:var(--missing-bg);
+  border:2px dashed var(--missing-border);
+  border-radius:8px;
+  padding:34px 14px;
+  color:#a45c5c;
+}
+.missing-icon{font-size:1.8rem;margin-bottom:8px;}
+.missing-name code{
+  background:#fff;
+  padding:2px 8px;
+  border-radius:4px;
+  border:1px solid var(--missing-border);
+}
+.missing-hint{
+  margin-top:8px;
+  font-size:0.82rem;
+  color:#b07a7a;
+}
+
+/* ---------- Notes ---------- */
+.r-note{
+  background:var(--warn-bg);
+  border:1px solid var(--warn-border);
+  border-radius:8px;
+  padding:12px 18px;
+  margin:0 0 18px;
+  font-size:0.88rem;
+  color:#6b5a26;
+}
+.r-final-note{
+  margin-top:48px;
+  background:#eef6f8;
+  border:1px solid #bcdde6;
+  color:#1f4f5c;
+  font-size:0.95rem;
+  line-height:1.6;
+}
+.r-final-note code{
+  background:#fff;
+  padding:1px 6px;
+  border-radius:4px;
+}
+
+code{font-size:0.92em;}
+</style>
+</head>
+<body>
+<div class="r-page">
+<div class="r-titleblock">
+  <h1>RNA-seq transcriptomic analysis
+  </h1>
+  <h2>Filovirus Infection Disrupts Epithelial Barrier Function and Ion Transport in Human iPSC-Derived Gut Organoids</h2>
+  <p class="r-subtitle">Pipeline DESeq2 applied to the dataset GSE300073
+  (infection of the human colonic organoids by the filoviruses Ebola and Marburg)</p>
+  <p class="r-meta">Corentin Jeantils &middot; 27/06/2026 &middot; report generated from <code>pipeline.R</code></p>
+</div>
+
+<nav class="r-toc">
+  <h2>Table of contents</h2>
+
+  <a href="#s0">Background &amp; Biological Context</a>
+  <a href="#s1">1. Set up of the environment</a>
+  <a href="#s2">2. Import and quality control of raw data</a>
+  <a href="#s2-1">2.1. Metadata of the samples</a>
+  <a href="#s3">3. Construction of the DESeq2 object and filtering</a>
+  <a href="#s4">4. Detection of viral transcripts in the count matrix</a>
+  <a href="#s5">5. Running the DESeq2 model and extracting contrasts</a>
+  <a href="#s6">6. VST Transformation (Variance Stabilizing Transformation)</a>
+  <a href="#s7">7. Classification of differentially expressed genes (DEG)</a>
+  <a href="#s8">8. Verification of the atypical mock sample (MG-MA-18)</a>
+  <a href="#s9">9. Visualisation of viral expression (EBOV / MARV)</a>
+  <a href="#s10">10. PCA</a>
+  <a href="#s11">11. Heatmap of Euclidean distances between samples</a>
+  <a href="#s12">12. Volcano plots</a>
+  <a href="#s13">13. Selection of the 250 most differentially expressed host genes</a>
+  <a href="#s14">14. Heatmap of the 250 most DE host genes</a>
+  <a href="#s15">15. GO (Gene Ontology) enrichment analysis</a>
+  <a href="#s16">16. Export (GO and DEGs)</a>
+  <a href="#s17">Conclusion</a>
+</nav>
+
+
+<h2 id="s0"> Background & Biological Context </h2>
+<pre class="r-output"><code>
+
+Filoviruses, particularly Ebola virus (EBOV) 
+and Marburg virus (MARV), cause severe hemorrhagic 
+fever with high mortality rates in humans. Despite their 
+similar genomic structure and classification within the
+same family (Filoviridae), these viruses exhibit distinct
+epidemiological patterns and clinical severities. 
+
+EBOV outbreaks show rapid progression to multi-organ
+failure, characterized by severe gastrointestinal
+symptoms including hemorrhagic diarrhea. 
+
+MARV infections, while equally lethal, sometimes present with different 
+inflammatory kinetics and tissue tropism patterns.
+
+The intestinal epithelium (tissue that covers the body's
+surface or lines the interior of all hollow organs) is a
+critical target tissue for filoviral infection. It serves
+as both a potential viral replication site and a critical
+barrier that leads to the characteristic secretory diarrhea
+and fluid loss observed in infected patients. 
+
+To analyse how EBOV and MARV differ in their manipulation
+of epithelial cell biology is essential for understanding
+their divergent pathogenic strategies.
+
+link to the article : https://pubmed.ncbi.nlm.nih.gov/41284734/
+
+</code></pre>
+
+<h2>1. Set up of the environment</h2>
+<pre class="r-source"><code>knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE) <span class="rc">#(for the markdown output) </span>
+
+library(DESeq2)</code></pre>
+<pre class="r-source"><code>library(tidyverse)   <span class="rc"># dplyr, ggplot2, etc...</span></code></pre>
+<pre class="r-source"><code>library(pheatmap)
+library(RColorBrewer)
+library(patchwork) <span class="rc">#(to combine the figs)</span>
+cat(&quot;\nlibraries loaded: DESeq2, tidyverse, pheatmap, RColorBrewer, patchwork\n&quot;)</code></pre>
+<pre class="r-output"><code>## 
+## libraries loaded: DESeq2, tidyverse, pheatmap, RColorBrewer, patchwork</code></pre>
+
+<pre class="r-source"><code><span class="rc"># paths, use the path of your own files</span>
+counts_path  &lt;- &quot;/Users/corentinjeantils/Documents/EFREI_2026/genomics/test1/GSE300073_counts.csv&quot;
+coldata_path &lt;- &quot;/Users/corentinjeantils/Documents/EFREI_2026/genomics/test1/metadata.csv&quot;
+output_dir   &lt;- &quot;/Users/corentinjeantils/Documents/EFREI_2026/genomics/test1/output&quot;
+figures &lt;- &quot;/Users/corentinjeantils/Documents/EFREI_2026/genomics/test1/output/figures&quot;
+tables &lt;- &quot;/Users/corentinjeantils/Documents/EFREI_2026/genomics/test1/output/tables&quot;
+
+if (!dir.exists(output_dir)) dir.create(output_dir, recursive = TRUE)
+if (!dir.exists(figures)) dir.create(figures, recursive = TRUE)
+if (!dir.exists(tables)) dir.create(tables, recursive = TRUE)
+print(paste(&quot;output directory at:&quot;, output_dir))</code></pre>
+<pre class="r-output"><code>## [1] &quot;output directory at: /Users/corentinjeantils/Documents/EFREI_2026/genomics/test1/output&quot;</code></pre>
+<h2 id="s2">2. Import and quality control of raw data</h2>
+<pre class="r-source"><code><span class="rc">#Loading RNAseq counts</span>
+<span class="rc"># Reads the CSV filen columns are delimited by &quot;;&quot; and the first row contains the column names. </span>
+counts_raw &lt;- read.delim(counts_path, sep = &quot;;&quot;, header = TRUE,
+                          check.names = FALSE, stringsAsFactors = FALSE)
+ 
+cat(&quot;\n------------------------\n&quot;)</code></pre>
+<pre class="r-source"><code>cat(&quot;\nStructure of the raw counts data:\n&quot;)</code></pre>
+<pre class="r-output"><code>## 
+## Structure of the raw counts data:</code></pre>
+<pre class="r-source"><code>str(counts_raw[, 1:5])</code></pre>
+<pre class="r-output"><code>## &#x27;data.frame&#x27;:    58409 obs. of  5 variables:
+##  $ Genes   : chr  &quot;DDX11L1&quot; &quot;WASH7P&quot; &quot;MIR6859.1&quot; &quot;MIR1302.2HG&quot; ...
+##  $ MG-MA-13: int  0 44 6 0 0 0 0 0 0 0 ...
+##  $ MG-MA-14: int  0 51 2 0 0 0 0 0 0 0 ...
+##  $ MG-MA-15: int  0 44 5 0 0 0 0 0 0 1 ...
+##  $ MG-MA-16: int  0 50 5 0 0 0 0 0 0 0 ...</code></pre>
+<pre class="r-source"><code>dim(counts_raw)</code></pre>
+<pre class="r-output"><code>## [1] 58409    19</code></pre>
+<pre class="r-source"><code>cat(&quot;\nNumber of duplicated gene symbols in the raw counts data:\n&quot;)</code></pre>
+<pre class="r-output"><code>## 
+## Number of duplicated gene symbols in the raw counts data:</code></pre>
+<pre class="r-source"><code>sum(duplicated(counts_raw$Genes))</code></pre>
+<pre class="r-output"><code>## [1] 0</code></pre>
+<pre class="r-source"><code>cat(&quot;\nif there are duplicated gene symbols, we aggregate them\n&quot;)</code></pre>
+<pre class="r-output"><code>## 
+## if there are duplicated gene symbols, we aggregate them</code></pre>
+<pre class="r-source"><code>if (sum(duplicated(counts_raw$Genes)) &gt; 0) {
+  counts_raw &lt;- counts_raw %&gt;%
+    group_by(Genes) %&gt;%
+    summarise(across(everything(), sum), .groups = &quot;drop&quot;)
+}
+<span class="rc">#DESeq2 requires 1 row = 1 unique gene </span>
+
+<span class="rc">#At this stage, we are preparing the data to answer the question :</span>
+<span class="rc">#&quot;what genes change when intestinal organoids </span>
+<span class="rc">#are infected with one of the filoviruses ?&quot;</span>
+
+
+
+counts_mat &lt;- as.data.frame(counts_raw)
+rownames(counts_mat) &lt;- counts_mat$Genes
+counts_mat$Genes &lt;- NULL
+<span class="rc">#The gene names are already in the row names.</span>
+
+
+<span class="rc"># columns must be numeric (raw counts)</span>
+counts_mat[] &lt;- lapply(counts_mat, as.integer) 
+counts_mat &lt;- as.matrix(counts_mat)
+<span class="rc">#Conversion to integers </span>
+<span class="rc">#because RNAseq produce counts, DESeq2 expects integer values </span>
+cat(&quot;\n------------------------\n&quot;)</code></pre>
+<pre class="r-source"><code>cat(&quot;Genes :&quot;, 
+  nrow(counts_mat), 
+  &quot;| Samples  :&quot;, 
+  ncol(counts_mat), 
+  &quot;\n&quot;)</code></pre>
+<pre class="r-output"><code>## Genes : 58409 | Samples  : 18</code></pre>
+<h2 id="s2-1">2.1. Metadata of the samples</h2>
+<pre class="r-source"><code><span class="rc">#the most important part ! </span>
+<span class="rc"># load-metadata</span>
+coldata &lt;- read.delim(coldata_path, 
+                      sep = &quot;;&quot;, 
+                      header = TRUE,
+                      stringsAsFactors = FALSE)
+
+str(coldata)</code></pre>
+<pre class="r-output"><code>## &#x27;data.frame&#x27;:    18 obs. of  5 variables:
+##  $ sample   : chr  &quot;MG-MA-13&quot; &quot;MG-MA-14&quot; &quot;MG-MA-15&quot; &quot;MG-MA-16&quot; ...
+##  $ virus    : chr  &quot;Mock&quot; &quot;Mock&quot; &quot;Mock&quot; &quot;Mock&quot; ...
+##  $ dpi      : int  1 1 1 3 3 3 1 1 1 3 ...
+##  $ organoid : chr  &quot;HCO&quot; &quot;HCO&quot; &quot;HCO&quot; &quot;HCO&quot; ...
+##  $ replicate: int  1 2 3 1 2 3 1 2 3 1 ...</code></pre>
+<pre class="r-source"><code>head(coldata)</code></pre>
+<pre class="r-output"><code>##     sample virus dpi organoid replicate
+## 1 MG-MA-13  Mock   1      HCO         1
+## 2 MG-MA-14  Mock   1      HCO         2
+## 3 MG-MA-15  Mock   1      HCO         3
+## 4 MG-MA-16  Mock   3      HCO         1
+## 5 MG-MA-17  Mock   3      HCO         2
+## 6 MG-MA-18  Mock   3      HCO         3</code></pre>
+<pre class="r-source"><code><span class="rc"># The columns used in the DESeq2 design MUST be factors</span>
+<span class="rc"># (DPI = days post infection)</span>
+coldata$virus    &lt;- factor(coldata$virus,    levels = c(&quot;Mock&quot;, &quot;EBOV&quot;, &quot;MARV&quot;))
+coldata$dpi      &lt;- factor(coldata$dpi,      levels = c(&quot;1&quot;, &quot;3&quot;))
+coldata$organoid &lt;- factor(coldata$organoid)
+coldata$replicate&lt;- factor(coldata$replicate)
+
+rownames(coldata) &lt;- coldata$sample
+
+<span class="rc">## check alignmen</span>
+<span class="rc"># CRITICAL step: DESeq2 requires an EXACT match (order + names)</span>
+<span class="rc"># between colnames(counts_mat) and rownames(coldata)</span>
+print(&#x27;Check alignment between count matrix and metadata:&#x27;)</code></pre>
+<pre class="r-output"><code>## [1] &quot;Check alignment between count matrix and metadata:&quot;</code></pre>
+<pre class="r-source"><code>print(setdiff(colnames(counts_mat), rownames(coldata)))</code></pre>
+<pre class="r-output"><code>## character(0)</code></pre>
+<pre class="r-source"><code>print(setdiff(rownames(coldata), colnames(counts_mat)))</code></pre>
+<pre class="r-output"><code>## character(0)</code></pre>
+<pre class="r-source"><code><span class="rc">#(both must be empty)  </span>
+
+<span class="rc"># Defensive reordering of coldata based on the order of counts</span>
+coldata &lt;- coldata[colnames(counts_mat), ]
+cat(&quot;\n------------------------\n&quot;)</code></pre>
+<pre class="r-source"><code><span class="rc"># Final check (must return TRUE)</span>
+print(&#x27;Final check: colnames(counts_mat) == rownames(coldata) ?&#x27;)</code></pre>
+<pre class="r-output"><code>## [1] &quot;Final check: colnames(counts_mat) == rownames(coldata) ?&quot;</code></pre>
+<pre class="r-source"><code>print(all(rownames(coldata) == colnames(counts_mat)))</code></pre>
+<pre class="r-output"><code>## [1] TRUE</code></pre>
+<pre class="r-source"><code><span class="rc"># summary design</span>
+table(coldata$virus, coldata$dpi)</code></pre>
+<pre class="r-output"><code>##       
+##        1 3
+##   Mock 3 3
+##   EBOV 3 3
+##   MARV 3 3</code></pre>
+<pre class="r-source"><code><span class="rc"># build dds group design</span>
+
+<span class="rc"># The paper compares EBOV vs Mock and MARV vs Mock SEPARATELY</span>
+<span class="rc"># at 1 dpi and 3 dpi (4 distinct comparisons; see Fig. 4F, which shows</span>
+<span class="rc"># 2 different Venn diagrams depending on the day). Using &quot;group,&quot; we can</span>
+<span class="rc"># extract exactly these 4 comparisons while keeping the 18</span>
+<span class="rc"># samples together, allowing DESeq2 to estimate technical variability</span>
+<span class="rc"># (&quot;dispersion&quot;) based on the maximum amount of data -&gt; greater statistical power</span>
+<span class="rc"># than if the table were split into 2 sub-tables (9 samples each).</span>
+
+<span class="rc"># We will create a &quot;group&quot; factor that combines virus + dpi into a single</span>
+<span class="rc"># variable with 6 levels (Mock_1, Mock_3, EBOV_1, EBOV_3, MARV_1, MARV_3).</span>
+
+coldata$group &lt;- factor(
+  paste(coldata$virus, coldata$dpi, sep = &quot;_&quot;),
+  levels = c(&quot;Mock_1&quot;, &quot;Mock_3&quot;, &quot;EBOV_1&quot;, &quot;EBOV_3&quot;, &quot;MARV_1&quot;, &quot;MARV_3&quot;)
+)
+
+table(coldata$group)</code></pre>
+<pre class="r-output"><code>## 
+## Mock_1 Mock_3 EBOV_1 EBOV_3 MARV_1 MARV_3 
+##      3      3      3      3      3      3</code></pre>
+<h2 id="s3">3. Construction of the DESeq2 object and filtering</h2>
+<pre class="r-source"><code><span class="rc">#now we creates a DESeq2 object from the count data and sample information</span>
+dds &lt;- DESeqDataSetFromMatrix(
+  countData = counts_mat,
+  colData   = coldata,
+  design    = ~ group
+)
+
+cat(&quot;\n&quot;)</code></pre>
+<pre class="r-source"><code><span class="rc">#DESeq2 determine which genes show a change in expression between two conditions based on RNA-seq data.</span>
+<span class="rc">#Raw counts can&#x27;t mean anything because sequencing depth can vary </span>
+<span class="rc">#between samples, for example one sample with 10 million reads and another with 20 million</span>
+<span class="rc">#won&#x27;t have the same level of expression, but it would be artificial.</span>
+
+<span class="rc">#DESeq2 normalizes the data : it calculates a scaling factor</span>
+<span class="rc"># for each sample to make the counts comparable. </span>
+<span class="rc"># then it uses a statistical model based on the negative binomial distribution to</span>
+<span class="rc"># estimate the natural variability of each gene and test if the observed </span>
+<span class="rc"># difference between conditions is too large to be attributed to chance.</span>
+<span class="rc">#So the result is a table containing for each gene a log2 fold change </span>
+<span class="rc"># (indicating the size of the change) and a  p-value measuring statistical significance. </span>
+
+
+<span class="rc">#For example, a gene strongly induced by infection will show a high log2FC and a very low p-value, whereas a </span>
+<span class="rc">#stable gene will show a log2FC close to zero and a non-significant p-value.</span>
+
+
+
+
+
+
+
+
+
+<span class="rc"># filter low counts</span>
+<span class="rc"># We remove genes with very low expression : they do not provide good information,</span>
+<span class="rc"># add noise, and will probably slow down the tests.</span>
+<span class="rc"># we keep a gene if it has at least 10 reads in at least</span>
+<span class="rc"># 3 samples (= the size of a biological group in this case).</span>
+keep &lt;- rowSums(counts(dds) &gt;= 10) &gt;= 3
+dds  &lt;- dds[keep, ]
+cat(&quot;Genes conserved after filtering :&quot;, nrow(dds), &quot;/&quot;, nrow(counts_mat),
+    &quot;(&quot;, round(100 * nrow(dds) / nrow(counts_mat), 1), &quot;%)\n&quot;)</code></pre>
+<pre class="r-output"><code>## Genes conserved after filtering : 18602 / 58409 ( 31.8 %)</code></pre>
+<h2 id="s4">4. Detection of viral transcripts in the count matrix</h2>
+<pre class="r-source"><code><span class="rc"># check viral transcripts</span>
+<span class="rc"># Checks if the viral genes (EBOV/MARV) are present in the matrix</span>
+<span class="rc"># If there is we could maybe replicate the panels D/E from Fig. 4 of the paper</span>
+viral_hits &lt;- grep(&quot;EBOV|MARV|^NP$|^VP24$|^VP35$|^VP40$|^GP$|^L$&quot;,
+                    rownames(counts_mat), value = TRUE, ignore.case = TRUE)
+print(&quot;Viral transcripts found in the count matrix:&quot;)</code></pre>
+<pre class="r-output"><code>## [1] &quot;Viral transcripts found in the count matrix:&quot;</code></pre>
+<pre class="r-source"><code>print(viral_hits)</code></pre>
+<pre class="r-output"><code>##  [1] &quot;MARVELD2&quot;  &quot;MARVELD1&quot;  &quot;MARVELD3&quot;  &quot;NP&quot;        &quot;VP35&quot;      &quot;VP40&quot;     
+##  [7] &quot;GP&quot;        &quot;VP24&quot;      &quot;L&quot;         &quot;NP_marv&quot;   &quot;VP35_marv&quot; &quot;VP40_marv&quot;
+## [13] &quot;GP_marv&quot;   &quot;VP30_marv&quot; &quot;VP24_marv&quot; &quot;L_marv&quot;</code></pre>
+<h2 id="s5">5. Running the DESeq2 model and extracting contrasts</h2>
+<pre class="r-source"><code><span class="rc"># run deseq2</span>
+<span class="rc"># This is where DESeq2 performs the statistical :</span>
+<span class="rc"># It normalizes the counts between samples </span>
+<span class="rc"># It estimates the dispersion gene by gene</span>
+<span class="rc"># It fits a generalized linear model and tests</span>
+<span class="rc"># each gene for the contrasts we will request </span>
+
+dds &lt;- DESeq(dds)</code></pre>
+<pre class="r-output"><code>## estimating size factors
+## estimating dispersions
+## gene-wise dispersion estimates
+## mean-dispersion relationship
+## final dispersion estimates
+## fitting model and testing</code></pre>
+<pre class="r-source"><code>resultsNames(dds)   <span class="rc"># list of model coefficients</span></code></pre>
+<pre class="r-output"><code>## [1] &quot;Intercept&quot;              &quot;group_Mock_3_vs_Mock_1&quot; &quot;group_EBOV_1_vs_Mock_1&quot;
+## [4] &quot;group_EBOV_3_vs_Mock_1&quot; &quot;group_MARV_1_vs_Mock_1&quot; &quot;group_MARV_3_vs_Mock_1&quot;</code></pre>
+<pre class="r-source"><code><span class="rc"># extract paper aligned contrasts : </span>
+<span class="rc"># EBOV vs Mock and MARV vs Mock at 1 dpi  (-&gt; left part of Fig 4 F/G)</span>
+
+<span class="rc"># EBOV vs Mock and MARV vs Mock at 3 dpi  (-&gt; right part of Fig 4 F/H)</span>
+
+
+res_EBOV_d1 &lt;- results(dds, contrast = c(&quot;group&quot;, &quot;EBOV_1&quot;, &quot;Mock_1&quot;), alpha = 0.05)
+res_MARV_d1 &lt;- results(dds, contrast = c(&quot;group&quot;, &quot;MARV_1&quot;, &quot;Mock_1&quot;), alpha = 0.05)
+res_EBOV_d3 &lt;- results(dds, contrast = c(&quot;group&quot;, &quot;EBOV_3&quot;, &quot;Mock_3&quot;), alpha = 0.05)
+res_MARV_d3 &lt;- results(dds, contrast = c(&quot;group&quot;, &quot;MARV_3&quot;, &quot;Mock_3&quot;), alpha = 0.05)
+
+
+
+cat(&quot;\n&quot;)</code></pre>
+<pre class="r-source"><code><span class="rc">#quick summary : how many significant up/down regulated genes there are</span>
+
+cat(&quot;\n=== EBOV vs Mock, 1 dpi ===\n&quot;);  summary(res_EBOV_d1)</code></pre>
+<pre class="r-output"><code>## 
+## === EBOV vs Mock, 1 dpi ===</code></pre>
+<pre class="r-output"><code>## 
+## out of 18602 with nonzero total read count
+## adjusted p-value &lt; 0.05
+## LFC &gt; 0 (up)       : 465, 2.5%
+## LFC &lt; 0 (down)     : 444, 2.4%
+## outliers [1]       : 227, 1.2%
+## low counts [2]     : 3906, 21%
+## (mean count &lt; 24)
+## [1] see &#x27;cooksCutoff&#x27; argument of ?results
+## [2] see &#x27;independentFiltering&#x27; argument of ?results</code></pre>
+<pre class="r-source"><code>cat(&quot;\n=== MARV vs Mock, 1 dpi ===\n&quot;);  summary(res_MARV_d1)</code></pre>
+<pre class="r-output"><code>## 
+## === MARV vs Mock, 1 dpi ===</code></pre>
+<pre class="r-output"><code>## 
+## out of 18602 with nonzero total read count
+## adjusted p-value &lt; 0.05
+## LFC &gt; 0 (up)       : 336, 1.8%
+## LFC &lt; 0 (down)     : 254, 1.4%
+## outliers [1]       : 227, 1.2%
+## low counts [2]     : 5936, 32%
+## (mean count &lt; 54)
+## [1] see &#x27;cooksCutoff&#x27; argument of ?results
+## [2] see &#x27;independentFiltering&#x27; argument of ?results</code></pre>
+<pre class="r-source"><code>cat(&quot;\n=== EBOV vs Mock, 3 dpi ===\n&quot;);  summary(res_EBOV_d3)</code></pre>
+<pre class="r-output"><code>## 
+## === EBOV vs Mock, 3 dpi ===</code></pre>
+<pre class="r-output"><code>## 
+## out of 18602 with nonzero total read count
+## adjusted p-value &lt; 0.05
+## LFC &gt; 0 (up)       : 888, 4.8%
+## LFC &lt; 0 (down)     : 1186, 6.4%
+## outliers [1]       : 227, 1.2%
+## low counts [2]     : 1082, 5.8%
+## (mean count &lt; 9)
+## [1] see &#x27;cooksCutoff&#x27; argument of ?results
+## [2] see &#x27;independentFiltering&#x27; argument of ?results</code></pre>
+<pre class="r-source"><code>cat(&quot;\n=== MARV vs Mock, 3 dpi ===\n&quot;);  summary(res_MARV_d3)</code></pre>
+<pre class="r-output"><code>## 
+## === MARV vs Mock, 3 dpi ===</code></pre>
+<pre class="r-output"><code>## 
+## out of 18602 with nonzero total read count
+## adjusted p-value &lt; 0.05
+## LFC &gt; 0 (up)       : 874, 4.7%
+## LFC &lt; 0 (down)     : 1546, 8.3%
+## outliers [1]       : 227, 1.2%
+## low counts [2]     : 0, 0%
+## (mean count &lt; 2)
+## [1] see &#x27;cooksCutoff&#x27; argument of ?results
+## [2] see &#x27;independentFiltering&#x27; argument of ?results</code></pre>
+<h2 id="s6">6. VST Transformation (Variance Stabilizing Transformation)</h2>
+<pre class="r-source"><code><span class="rc"># vst transform (Variance Stabilizing Transformation)</span>
+<span class="rc"># blind = FALSE : the transformation accounts for the design to</span>
+<span class="rc"># estimate the mean-variance trend </span>
+
+vst_data &lt;- vst(dds, blind = FALSE)
+
+<span class="rc"># In fact, DESeq and vst perform two distinct functions:</span>
+<span class="rc"># it identifies differentially expressed genes </span>
+<span class="rc"># and generates metrics such as log2 fold changes </span>
+<span class="rc"># and p-values, highlighting genes that show significant </span>
+<span class="rc"># changes between conditions. Once the VST object contains </span>
+<span class="rc"># these estimates, VST transforms the counts, applying a </span>
+<span class="rc"># method designed to stabilize variance and make the distances</span>
+<span class="rc"># between samples more representative.</span>
+
+
+
+
+
+
+
+<span class="rc"># remove false positive viral genes </span>
+<span class="rc"># Confirmed real viral transcripts in the count matrix</span>
+viral_genes_ebov &lt;- c(&quot;NP&quot;, &quot;VP35&quot;, &quot;VP40&quot;, &quot;VP30&quot;, &quot;GP&quot;, &quot;VP24&quot;, &quot;L&quot;)
+viral_genes_marv &lt;- c(&quot;NP_marv&quot;, &quot;VP35_marv&quot;, &quot;VP40_marv&quot;, &quot;GP_marv&quot;,
+                       &quot;VP30_marv&quot;, &quot;VP24_marv&quot;, &quot;L_marv&quot;)
+
+<span class="rc"># (MARVELD1/2/3 excluded: human genes, false positives from the previous grep)</span>
+
+cat(&quot;Confirmed viral transcripts in EBOV :&quot;, length(viral_genes_ebov), &quot;\n&quot;)</code></pre>
+<pre class="r-output"><code>## Confirmed viral transcripts in EBOV : 7</code></pre>
+<pre class="r-source"><code>cat(&quot;Confirmed viral transcripts in MARV :&quot;, length(viral_genes_marv), &quot;\n&quot;)</code></pre>
+<pre class="r-output"><code>## Confirmed viral transcripts in MARV : 7</code></pre>
+<h2 id="s7">7. Classification of differentially expressed genes (DEG)</h2>
+<pre class="r-source"><code><span class="rc"># classify DEGs both thresholds (Differentially Expressed Genes)</span>
+<span class="rc"># Each gene is classified as UP / DOWN / NS based on 2 definitions :</span>
+<span class="rc">#</span>
+<span class="rc">#  - &quot;paper&quot;    : RAW p-value &lt; 0.05  AND  |log2FC| &gt; 2   (= Fig 4F from the paper (i put it below))</span>
+<span class="rc">#  - &quot;standard&quot; : ADJUSTED p-value &lt; 0.05 AND |log2FC| &gt; 1   (= standard stringent threshold)</span>
+<span class="rc">#</span>
+<span class="rc"># Why keep both? The &quot;paper&quot; threshold allows us to compare</span>
+<span class="rc"># our figures directly with those in the article. The &quot;standard&quot; threshold</span>
+<span class="rc"># is the one we will use for the volcano plot / heatmap / GO enrichment,</span>
+<span class="rc"># as it is statistically more defensible in a report.</span>
+
+<span class="rc"># caption of the fig4 of the paper : </span>
+
+<span class="rc"># &quot;(A) Schematic overview of the bulk RNA-seq experimental </span>
+<span class="rc"># workflow in iPSC-derived proximal human intestinal organoids </span>
+<span class="rc"># (HIOs). Illustrations created in BioRender. Muhlberger, E.</span>
+<span class="rc"># (2025) https://BioRender.com/nncviy6. </span>
+<span class="rc"># (B and C) Principal component analysis (PCA) of the distal iPSC-derived </span>
+<span class="rc"># HCO transcriptomic response to EBOV and MARV infections at 1 and 3 dpi. </span>
+<span class="rc"># (D) Read counts of EBOV transcripts at 1 (light blue) and 3 (dark blue) dpi. </span>
+<span class="rc"># (E) Read counts of MARV transcripts at 1 (light green) and 3 (dark green) dpi. </span>
+<span class="rc"># (F) Venn diagrams illustrating the number of </span>
+<span class="rc"># common and unique significantly differentially expressed genes (DEGs)</span>
+<span class="rc"># in MARV and EBOV-infected iPSC-derived HCOs at different infection </span>
+<span class="rc"># time points. Genes that were upregulated (LogFC &gt; 2, p &lt; 0.05) and </span>
+<span class="rc"># downregulated (LogFC &lt; -2, p &lt; 0.05) at each time point (1 and 3 dpi) </span>
+<span class="rc"># are shown. Gene set enrichment analysis (GSEA) was performed using </span>
+<span class="rc"># the Hallmark gene sets on the top DEG sets in distal HCOs at (G) 1 dpi </span>
+<span class="rc"># and (H) 3 dpi, compared to mock-infected controls, for both EBOV and </span>
+<span class="rc"># MARV infections. Striped bars indicate non-significant results, while </span>
+<span class="rc"># solid bars represent statistically significant findings (p &lt; 0.05).&quot;</span>
+
+
+
+classify_deg &lt;- function(res, label) {
+  df &lt;- as.data.frame(res)
+  df$gene &lt;- rownames(df)
+  <span class="rc"># Remove genes for which DESeq2 could not calculate a p-value</span>
+
+  df &lt;- df[!is.na(df$padj) &amp; !is.na(df$pvalue), ]
+
+  df$dir_paper &lt;- &quot;NS&quot;
+  df$dir_paper[df$pvalue &lt; 0.05 &amp; df$log2FoldChange &gt;  2] &lt;- &quot;UP&quot;
+  df$dir_paper[df$pvalue &lt; 0.05 &amp; df$log2FoldChange &lt; -2] &lt;- &quot;DOWN&quot;
+
+  df$dir_std &lt;- &quot;NS&quot;
+  df$dir_std[df$padj &lt; 0.05 &amp; df$log2FoldChange &gt;  1] &lt;- &quot;UP&quot;
+  df$dir_std[df$padj &lt; 0.05 &amp; df$log2FoldChange &lt; -1] &lt;- &quot;DOWN&quot;
+
+  cat(&quot;\n===&quot;, label, &quot;===\n&quot;)
+  cat(&quot;Paper threshold (p&lt;0.05, |log2FC|&gt;2)    -&gt; UP:&quot;,
+      sum(df$dir_paper == &quot;UP&quot;), &quot; | DOWN:&quot;, sum(df$dir_paper == &quot;DOWN&quot;), &quot;\n&quot;)
+  cat(&quot;Standard threshold (padj&lt;0.05, |log2FC|&gt;1) -&gt; UP:&quot;,
+      sum(df$dir_std   == &quot;UP&quot;), &quot; | DOWN:&quot;, sum(df$dir_std   == &quot;DOWN&quot;), &quot;\n&quot;)
+  df
+}
+
+
+deg_EBOV_d1 &lt;- classify_deg(res_EBOV_d1, &quot;EBOV vs Mock, 1 dpi&quot;)</code></pre>
+<pre class="r-output"><code>## 
+## === EBOV vs Mock, 1 dpi ===
+## Paper threshold (p&lt;0.05, |log2FC|&gt;2)    -&gt; UP: 109  | DOWN: 3 
+## Standard threshold (padj&lt;0.05, |log2FC|&gt;1) -&gt; UP: 281  | DOWN: 19</code></pre>
+<pre class="r-source"><code>deg_MARV_d1 &lt;- classify_deg(res_MARV_d1, &quot;MARV vs Mock, 1 dpi&quot;)</code></pre>
+<pre class="r-output"><code>## 
+## === MARV vs Mock, 1 dpi ===
+## Paper threshold (p&lt;0.05, |log2FC|&gt;2)    -&gt; UP: 41  | DOWN: 2 
+## Standard threshold (padj&lt;0.05, |log2FC|&gt;1) -&gt; UP: 131  | DOWN: 17</code></pre>
+<pre class="r-source"><code>deg_EBOV_d3 &lt;- classify_deg(res_EBOV_d3, &quot;EBOV vs Mock, 3 dpi&quot;)</code></pre>
+<pre class="r-output"><code>## 
+## === EBOV vs Mock, 3 dpi ===
+## Paper threshold (p&lt;0.05, |log2FC|&gt;2)    -&gt; UP: 32  | DOWN: 1137 
+## Standard threshold (padj&lt;0.05, |log2FC|&gt;1) -&gt; UP: 184  | DOWN: 967</code></pre>
+<pre class="r-source"><code>deg_MARV_d3 &lt;- classify_deg(res_MARV_d3, &quot;MARV vs Mock, 3 dpi&quot;)</code></pre>
+<pre class="r-output"><code>## 
+## === MARV vs Mock, 3 dpi ===
+## Paper threshold (p&lt;0.05, |log2FC|&gt;2)    -&gt; UP: 91  | DOWN: 1118 
+## Standard threshold (padj&lt;0.05, |log2FC|&gt;1) -&gt; UP: 268  | DOWN: 997</code></pre>
+<h2 id="s8">8. Verification of the atypical mock sample (MG-MA-18)</h2>
+<pre class="r-source"><code>norm_counts &lt;- counts(dds, normalized = TRUE)
+
+print(norm_counts[viral_genes_ebov, coldata$sample[coldata$virus == &quot;Mock&quot;]])</code></pre>
+<pre class="r-output"><code>##      MG-MA-13 MG-MA-14 MG-MA-15 MG-MA-16 MG-MA-17  MG-MA-18
+## NP          0        0        0        0 1.028727 311.82800
+## VP35        0        0        0        0 0.000000 289.81661
+## VP40        0        0        0        0 0.000000 135.73689
+## VP30        0        0        0        0 0.000000 128.39976
+## GP          0        0        0        0 0.000000 315.49656
+## VP24        0        0        0        0 0.000000  80.70842
+## L           0        0        0        0 0.000000   0.00000</code></pre>
+<h2 id="s9">9. Visualisation of viral expression (EBOV / MARV)</h2>
+<pre class="r-source"><code><span class="rc"># viral expression plot</span>
+<span class="rc"># counts(dds, normalized = TRUE) : counts corrected for sequencing depth</span>
+<span class="rc"># (a sample sequenced at twice the depth has twice as many</span>
+<span class="rc"># reads for everythig)</span>
+
+norm_counts &lt;- counts(dds, normalized = TRUE)
+
+ebov_mat &lt;- norm_counts[rownames(norm_counts) %in% viral_genes_ebov, , drop = FALSE]
+marv_mat &lt;- norm_counts[rownames(norm_counts) %in% viral_genes_marv, , drop = FALSE]
+
+<span class="rc"># Function to convert counts to &quot;long&quot; format (1 row = 1 gene x 1 sample)</span>
+build_viral_df &lt;- function(mat, gene_set_label) {
+  as.data.frame(t(mat)) %&gt;%
+    tibble::rownames_to_column(&quot;sample&quot;) %&gt;%
+    tidyr::pivot_longer(-sample, names_to = &quot;gene&quot;, values_to = &quot;count&quot;) %&gt;%
+    dplyr::left_join(coldata %&gt;% dplyr::select(sample, virus, dpi), by = &quot;sample&quot;) %&gt;%
+    dplyr::mutate(gene_set = gene_set_label,
+                  gene = gsub(&quot;_marv$&quot;, &quot;&quot;, gene))   
+}
+
+viral_df &lt;- dplyr::bind_rows(
+  build_viral_df(ebov_mat, &quot;Transcripts EBOV&quot;),
+  build_viral_df(marv_mat, &quot;Transcripts MARV&quot;)
+)
+
+viral_df$dpi_label &lt;- paste0(viral_df$dpi, &quot; dpi&quot;)
+
+<span class="rc"># Mean + standard deviation by group (virus x dpi x gene)</span>
+viral_summary &lt;- viral_df %&gt;%
+  dplyr::group_by(gene_set, gene, virus, dpi_label) %&gt;%
+  dplyr::summarise(mean_count = mean(count), sd_count = sd(count), .groups = &quot;drop&quot;)
+
+fig_viral &lt;- ggplot(viral_summary,
+                     aes(x = dpi_label, y = mean_count + 1, fill = virus)) +
+  geom_col(position = position_dodge(0.8), width = 0.7,
+           color = &quot;black&quot;, linewidth = 0.2) +
+  geom_errorbar(
+    aes(ymin = pmax(mean_count - sd_count, 0) + 1,
+        ymax = mean_count + sd_count + 1),
+    position = position_dodge(0.8), width = 0.25
+  ) +
+  facet_grid(gene_set ~ gene, scales = &quot;free_y&quot;) +
+  scale_y_log10() +
+  scale_fill_manual(values = c(Mock = &quot;grey60&quot;, EBOV = &quot;#4477AA&quot;, MARV = &quot;#228833&quot;)) +
+  labs(
+    title    = &quot;Expression of the viral transcripts EBOV and MARV&quot;,
+    subtitle = &quot;Normalized counts DESeq2 (log10 scale, +1 to handle zeros)&quot;,
+    x = NULL, y = &quot;Normalized count (log10 + 1)&quot;, fill = &quot;Virus&quot;
+  ) +
+  theme_bw(base_size = 11) +
+  theme(strip.text = element_text(face = &quot;bold&quot;),
+        axis.text.x = element_text(angle = 30, hjust = 1))
+
+ggsave(&quot;viral_expression.png&quot;, fig_viral, path = figures, width = 14, height = 6, dpi = 300, bg = &quot;white&quot;)
+fig_viral</code></pre>
+
+
+
+
+
+
+
+
+<img src="output/figures/viral_expression.png" width="700" />
+
+
+
+
+
+<pre class="r-source"><code><span class="rc"></span>
+
+<span class="rc">#An increase in viral expression is observed between </span>
+<span class="rc">#1 dpi and 3 dpi (a gain of 2 to 3 orders of magnitude), </span>
+<span class="rc">#consistent with active viral replication, and—importantly—high </span>
+<span class="rc">#specificity: EBOV transcripts are absent in MARV samples and </span>
+<span class="rc">#vice versa, which validates the mapping.</span>
+
+<span class="rc">#problem : </span>
+<span class="rc">#In theory, a mock (uninfected) sample should not </span>
+<span class="rc">#have any reads aligning to EBOV/MARV viral genes.</span>
+<span class="rc">#The metadata confirms that MG-MA-18 is indeed mock</span>
+<span class="rc"># there are no visible data entry errors.</span>
+<span class="rc">#let us plot a quick PCA to see if this sample is an outlier or not.</span>
+
+
+pca_plot &lt;- plotPCA(vst_data, intgroup = c(&quot;virus&quot;, &quot;dpi&quot;))</code></pre>
+<pre class="r-output"><code>using ntop=500 top features by variance</code></pre>
+<pre class="r-source"><code>ggsave(&quot;pca_plot.png&quot;, pca_plot, path = figures, width = 8, height = 6, dpi = 300, bg = &quot;white&quot;)
+pca_plot</code></pre>
+<h2 id="s10">10. PCA</h2>
+<pre class="r-source"><code><span class="rc">#Even the isolated mock point stays very far from the EBOV:3 cluster </span>
+<span class="rc">#(the khaki points at the bottom right, around PC1 = 17–19, PC2 = -6 to -15). </span>
+<span class="rc">#If MG-MA-18 had truly been infected with EBOV at 3 dpi, </span>
+<span class="rc">#we would expect to see it shift toward the EBOV:3 </span>
+<span class="rc">#cluster. However, in this case, the isolated Mock </span>
+<span class="rc">#point moves in the opposite direction (very positive PC2), not toward EBOV at all.</span>
+<span class="rc">#This suggests the technical noise hypothesis</span>
+
+
+pca_data &lt;- plotPCA(vst_data, intgroup = c(&quot;virus&quot;, &quot;dpi&quot;), returnData = TRUE)</code></pre>
+
+<img src="output/figures/pca_plot.png" width="700" />
+
+
+<pre class="r-source"><code>pca_data$sample &lt;- rownames(pca_data)
+print(pca_data[order(pca_data$dpi, pca_data$virus), c(&quot;sample&quot;,&quot;virus&quot;,&quot;dpi&quot;,&quot;PC1&quot;,&quot;PC2&quot;)])</code></pre>
+<pre class="r-output"><code>##            sample virus dpi         PC1           PC2
+## MG-MA-13 MG-MA-13  Mock   1  -1.1432881   5.826545535
+## MG-MA-14 MG-MA-14  Mock   1  -3.4332857  17.540633417
+## MG-MA-15 MG-MA-15  Mock   1  -1.5207144  11.362008225
+## MG-MA-19 MG-MA-19  EBOV   1   8.0558005  -0.001297063
+## MG-MA-20 MG-MA-20  EBOV   1   9.6083829  -0.151628943
+## MG-MA-21 MG-MA-21  EBOV   1   4.3403274   4.566248934
+## MG-MA-25 MG-MA-25  MARV   1   0.1252289  -1.618514317
+## MG-MA-26 MG-MA-26  MARV   1  -2.3945264   1.932476427
+## MG-MA-27 MG-MA-27  MARV   1   1.1060481   5.359108380
+## MG-MA-16 MG-MA-16  Mock   3  -2.4131150  -1.059589710
+## MG-MA-17 MG-MA-17  Mock   3  -2.8522817   0.868356562
+## MG-MA-18 MG-MA-18  Mock   3  -3.5557645  22.498333122
+## MG-MA-22 MG-MA-22  EBOV   3  17.1868692  -5.984094208
+## MG-MA-23 MG-MA-23  EBOV   3  19.0000991 -10.922569709
+## MG-MA-24 MG-MA-24  EBOV   3  18.9507515 -14.520266341
+## MG-MA-28 MG-MA-28  MARV   3 -19.6789544  -8.052693411
+## MG-MA-29 MG-MA-29  MARV   3 -20.9192810 -13.282976154
+## MG-MA-30 MG-MA-30  MARV   3 -20.4622965 -14.360080746</code></pre>
+<pre class="r-source"><code><span class="rc">#the table with PC1/PC2 for each sample confirms that the isolated </span>
+<span class="rc">#point at the top of the graph is indeed MG-MA-18 : </span>
+
+<span class="rc">#MG-MA-18 MG-MA-18  Mock   3  -3.5557645  22.498333122</span>
+
+<span class="rc">#He has a PC1 of -3.56—right within the </span>
+<span class="rc">#range seen in the mock data, and far </span>
+<span class="rc">#away from the EBOV3 samples.</span>
+
+<span class="rc">#Let us compare it wit the paper data (fig 4) </span>
+<span class="rc">#(only the relative separation between groups in a PCA, of course.)</span>
+
+
+<span class="rc">#the Mock points are quite spread out along PC2 with one point reaching 12.3, isolated from the others. </span>
+<span class="rc">#This is exactly the pattern we observed with our outlier, MG-MA-18 </span>
+<span class="rc">#(PC2 = 22.5)</span>
+<span class="rc">#This suggests that the high variability of the mock samples along PC2 </span>
+<span class="rc">#isn&#x27;t an artifact specific to your pipeline, but a genuine characteristic </span>
+<span class="rc"># of this dataset—which is rather reassuring.</span>
+
+<span class="rc">#Paper: PC1 = 19.3%, PC2 = 16.9% total 36.2%</span>
+<span class="rc">#Me: PC1 = 32%, PC2 = 24% total 56%</span>
+
+<span class="rc"># Visually, the separation between groups is cleaner,</span>
+<span class="rc"># and more variance is concentrated on just two axes.</span>
+<span class="rc"># I don&#x27;t know why. </span>
+
+
+
+<span class="rc">#cleaner version of the pca plot : </span>
+
+print(&quot;Visualizing the PCA plot &quot;)</code></pre>
+<pre class="r-source"><code>pca_data &lt;- plotPCA(vst_data, intgroup = c(&quot;virus&quot;, &quot;dpi&quot;),
+                     returnData = TRUE, ntop = 500)</code></pre>
+<pre class="r-source"><code>pct_var  &lt;- round(100 * attr(pca_data, &quot;percentVar&quot;), 1)
+pca_data$dpi &lt;- factor(pca_data$dpi)
+
+
+figB &lt;- ggplot(pca_data, aes(PC1, PC2, color = virus, shape = dpi)) +
+  geom_point(size = 4, alpha = 0.9, stroke = 0.8) +
+  scale_color_manual(values = c(Mock = &quot;grey50&quot;, EBOV = &quot;#E64B8B&quot;, MARV = &quot;#7B3FA0&quot;)) +
+  labs(title = &quot;PCA — colored by infection&quot;,
+       x = paste0(&quot;PC1 (&quot;, pct_var[1], &quot;%)&quot;),
+       y = paste0(&quot;PC2 (&quot;, pct_var[2], &quot;%)&quot;), shape = &quot;dpi&quot;) +
+  theme_bw(base_size = 12) + theme(legend.position = &quot;right&quot;)
+
+figC &lt;- ggplot(pca_data, aes(PC1, PC2, color = dpi, shape = virus)) +
+  geom_point(size = 4, alpha = 0.9, stroke = 0.8) +
+  scale_color_manual(values = c(&quot;1&quot; = &quot;#1B9E77&quot;, &quot;3&quot; = &quot;#D95F02&quot;)) +
+  labs(title = &quot;PCA — colored by dpi&quot;,
+       x = paste0(&quot;PC1 (&quot;, pct_var[1], &quot;%)&quot;),
+       y = paste0(&quot;PC2 (&quot;, pct_var[2], &quot;%)&quot;), shape = &quot;Virus&quot;) +
+  theme_bw(base_size = 12) + theme(legend.position = &quot;right&quot;)
+
+fig_pca &lt;- figB + figC   <span class="rc">#side by side thanks to patchwork</span>
+ggsave(&quot;pca_combined.png&quot;, fig_pca, path = figures, width = 13, height = 6, dpi = 300, bg = &quot;white&quot;)
+fig_pca</code></pre>
+
+<img src="output/figures/pca_combined.png" width="700" />
+
+
+<h2 id="s11">11. Heatmap of Euclidean distances between samples</h2>
+<pre class="r-source"><code><span class="rc"></span>
+
+
+<span class="rc"># sample distance heatmap</span>
+samp_dist &lt;- dist(t(assay(vst_data)))
+samp_mat  &lt;- as.matrix(samp_dist)
+
+sample_labels &lt;- paste(coldata$virus, paste0(coldata$dpi, &quot;dpi&quot;),
+                        paste0(&quot;r&quot;, coldata$replicate), sep = &quot;_&quot;)
+rownames(samp_mat) &lt;- sample_labels
+colnames(samp_mat) &lt;- sample_labels
+
+samp_anno &lt;- data.frame(
+  Virus = coldata$virus,
+  DPI   = paste0(coldata$dpi, &quot; dpi&quot;),
+  row.names = sample_labels
+)
+<span class="rc"># pheatmap::pheatmap() with the :: prefix to forces R to use the TRUE</span>
+<span class="rc"># function from the pheatmap package, regardless of what is loaded/masked later</span>
+pheatmap::pheatmap(
+  mat               = samp_mat,
+  color             = colorRampPalette(rev(RColorBrewer::brewer.pal(9, &quot;Blues&quot;)))(100),
+  annotation_col    = samp_anno,
+  annotation_row    = samp_anno,
+  annotation_colors = list(
+    Virus = c(Mock = &quot;grey50&quot;, EBOV = &quot;#E64B8B&quot;, MARV = &quot;#7B3FA0&quot;),
+    DPI   = c(&quot;1 dpi&quot; = &quot;#1B9E77&quot;, &quot;3 dpi&quot; = &quot;#D95F02&quot;)
+  ),
+  clustering_method = &quot;ward.D2&quot;,
+  fontsize          = 10,
+  border_color      = &quot;white&quot;,
+  main              = &quot;Euclidean distance between samples (VST)&quot;,
+  <span class="rc">#filename          = &quot;sample_distance.png&quot;,</span>
+  filename          = file.path(figures, &quot;sample_distance.png&quot;),
+  width             = 9,
+  height            = 8
+)
+</code></pre>
+
+<img src="output/figures/sample_distance.png" width="700" />
+
+<pre class="r-source"><code>
+<span class="rc"># the paper does not include an inter-sample distance heatmap.</span>
+
+<span class="rc"># we have the confirmation of the outlier:</span>
+<span class="rc"># The Mock_3dpi_r3 row/column (= MG-MA-18) </span>
+<span class="rc">#is almost entirely white—indicating maximum </span>
+<span class="rc">#distance from all other samples, including its </span>
+<span class="rc">#own Mock replicates. This confirms for a third time,</span>
+<span class="rc"># using a third method, that it is indeed an atypical sample.</span>
+
+<span class="rc">#The infected 1 dpi samples cluster together regardless of</span>
+<span class="rc"># the virus—showing a small distance between MARV_1dpi and </span>
+<span class="rc">#EBOV_1dpi. This aligns exactly with the text of the paper: </span>
+<span class="rc">#at 1 dpi, 160 upregulated genes are shared by both viruses </span>
+<span class="rc">#(compared to only 45 and 144 specific ones; Fig. 4F).</span>
+
+<span class="rc">#The Mock samples remain clustered together, with the </span>
+<span class="rc">#exception of the outlier.</span>
+
+<span class="rc">#MARV_3dpi and EBOV_3dpi each form their own compact,</span>
+<span class="rc">#well-separated cluster, distinct from one another. </span>
+<span class="rc">#This clearly illustrates the statement in the paper regarding </span>
+<span class="rc">#&quot;distinct and evolving host responses&quot;—the response becomes </span>
+<span class="rc">#increasingly virus-specific over time, consistent with the </span>
+<span class="rc">#divergence in the interferon signal they describe </span>
+<span class="rc">#(MARV maintains IFN activation, whereas EBOV suppresses </span>
+<span class="rc">#it at 3 dpi).</span></code></pre>
+
+
+
+<h2 id="s12">12. Volcano plots</h2>
+<pre class="r-source"><code><span class="rc"># Exclude viral genes from host analysis</span>
+<span class="rc"># Viral transcripts are trivial (present/absent = infected/uninfected)</span>
+<span class="rc"># and contribute nothing to the analysis of host BIOLOGICAL PATHWAYS. They are</span>
+<span class="rc"># removed from the result tables used for volcano plots, heatmaps, and GO analysis,</span>
+<span class="rc"># while keeping res_EBOV_d1 etc. intact for reference if needed.</span>
+all_viral_genes &lt;- c(viral_genes_ebov, viral_genes_marv)
+
+strip_viral &lt;- function(res) res[!(rownames(res) %in% all_viral_genes), ]
+
+res_EBOV_d1_host &lt;- strip_viral(res_EBOV_d1)
+res_MARV_d1_host &lt;- strip_viral(res_MARV_d1)
+res_EBOV_d3_host &lt;- strip_viral(res_EBOV_d3)
+res_MARV_d3_host &lt;- strip_viral(res_MARV_d3)
+
+
+
+
+<span class="rc"># volcano function </span>
+make_volcano &lt;- function(res, contrast_label) {
+  df &lt;- as.data.frame(res)
+  df$gene &lt;- rownames(df)
+  df &lt;- df[!is.na(df$padj), ]
+
+  df$direction &lt;- &quot;NS&quot;
+  df$direction[df$padj &lt; 0.05 &amp; df$log2FoldChange &gt;  2] &lt;- &quot;UP&quot;
+  df$direction[df$padj &lt; 0.05 &amp; df$log2FoldChange &lt; -2] &lt;- &quot;DOWN&quot;
+  df$neg_log10_padj &lt;- -log10(df$padj)
+
+  top_labels &lt;- df %&gt;%
+    dplyr::filter(direction != &quot;NS&quot;) %&gt;%
+    dplyr::arrange(padj) %&gt;%
+    dplyr::slice_head(n = 20) %&gt;%
+    dplyr::pull(gene)
+  df$plot_label &lt;- ifelse(df$gene %in% top_labels, df$gene, &quot;&quot;)
+
+  vol_colors &lt;- c(UP = &quot;#E41A1C&quot;, DOWN = &quot;#377EB8&quot;, NS = &quot;grey75&quot;)
+
+  ggplot(df %&gt;% dplyr::arrange(direction),
+         aes(log2FoldChange, neg_log10_padj, color = direction, label = plot_label)) +
+    geom_point(alpha = 0.7, size = 1.3) +
+    geom_hline(yintercept = -log10(0.05), linetype = &quot;dashed&quot;, linewidth = 0.3) +
+    geom_vline(xintercept = c(-1, 1), linetype = &quot;dashed&quot;, linewidth = 0.3) +
+    ggrepel::geom_text_repel(
+      data = dplyr::filter(df, plot_label != &quot;&quot;),
+      size = 2.6, fontface = &quot;bold&quot;, color = &quot;black&quot;,
+      max.overlaps = 25, segment.size = 0.2
+    ) +
+    scale_color_manual(values = vol_colors,
+      labels = c(UP = paste0(&quot;Up (&quot;, sum(df$direction == &quot;UP&quot;), &quot;)&quot;),
+                 DOWN = paste0(&quot;Down (&quot;, sum(df$direction == &quot;DOWN&quot;), &quot;)&quot;),
+                 NS = paste0(&quot;NS (&quot;, sum(df$direction == &quot;NS&quot;), &quot;)&quot;))) +
+    labs(title = contrast_label,
+         x = expression(log[2]~&quot;Fold Change&quot;),
+         y = expression(-log[10]~&quot;(padj)&quot;), color = NULL) +
+    theme_bw(base_size = 10) +
+    theme(plot.title = element_text(face = &quot;bold&quot;, size = 11),
+          legend.position = &quot;bottom&quot;)
+}
+
+v1 &lt;- make_volcano(res_EBOV_d1_host, &quot;EBOV vs Mock — 1 dpi&quot;)
+v2 &lt;- make_volcano(res_MARV_d1_host, &quot;MARV vs Mock — 1 dpi&quot;)
+v3 &lt;- make_volcano(res_EBOV_d3_host, &quot;EBOV vs Mock — 3 dpi&quot;)
+v4 &lt;- make_volcano(res_MARV_d3_host, &quot;MARV vs Mock — 3 dpi&quot;)
+
+
+
+fig_volcano &lt;- (v1 + v2) / (v3 + v4)
+ggsave(&quot;volcano_4panels.png&quot;, fig_volcano, path = figures, width = 12, height = 10, dpi = 300, bg = &quot;white&quot;)
+fig_volcano
+</code></pre>
+
+<img src="output/figures/volcano_4panels.png" width="700" />
+
+<pre class="r-source"><code>
+<span class="rc">#Volcano plots display the distribution of gene </span>
+<span class="rc">#expression changes for over 18,000 genes in </span>
+<span class="rc">#each contrast (Figure 4F). Each point represents </span>
+<span class="rc">#a gene, positioned according to two criteria: </span>
+<span class="rc">#fold change (magnitude of change, x-axis) and </span>
+<span class="rc">#statistical significance (y-axis). Upregulated (red)</span>
+<span class="rc"># and downregulated (blue) genes appear clearly separated, </span>
+<span class="rc">#while non-significant genes (gray) occupy the center.</span>
+
+<span class="rc">#At 1 dpi:</span>
+<span class="rc">#One day post-infection, EBOV and MARV induce remarkably</span>
+<span class="rc"># convergent transcriptional responses. Our data show 66 </span>
+<span class="rc">#upregulated genes for EBOV and 21 for MARV, with minimal </span>
+<span class="rc">#downregulation in both cases. At this early stage, the cell</span>
+<span class="rc"># does not yet distinguish the type of virus.</span>
+
+<span class="rc">#At 3 dpi: divergence</span>
+<span class="rc">#Different viral strategies are observed.</span>
+<span class="rc">#MARV-infected samples show 52 upregulated genes </span>
+<span class="rc">#(doubled since 1 dpi) and 698 downregulated genes,</span>
+<span class="rc">#while EBOV samples show 17 upregulated genes (greatly </span>
+<span class="rc">#decreased since 1 dpi) and 749 downregulated genes.</span>
+<span class="rc">#The response to MARV is logical; the upregulated genes </span>
+<span class="rc">#observed are ISGs (interferon-stimulated genes), the cell&#x27;s</span>
+<span class="rc"># immune alarm molecules (MX1, IFIT1, ISG15, STAT1, OAS3, IFI6).</span>
+<span class="rc">#This cluster is clearly visible in the graph and is confirmed in the paper:</span>
+<span class="rc">#&quot;MARV-infected HCOs showed robust induction of ISGs, including</span>
+<span class="rc"># OASL, MX1, IFIT1, IFIT2, IFI6, and CXCL10&quot; (page 9, Figure 5B).</span>
+<span class="rc">#Indeed, we find OAS3, MX1, IFIT1, and IFI6. </span>
+<span class="rc">#The remaining differences stem from our pipelines: </span>
+<span class="rc">#the paper uses edgeR + limma, whereas I use DESeq2.</span>
+
+<span class="rc">#Conversely, for EBOV:</span>
+<span class="rc">#17 genes are upregulated while 749 are downregulated </span>
+<span class="rc">#(compared to 66 upregulated at 1 dpi). This indicates </span>
+<span class="rc">#a wave of suppression, but—more importantly—we observe </span>
+<span class="rc">#a massive cluster of downregulation.</span>
+<span class="rc">#As the paper confirms:</span>
+<span class="rc">#&quot;EBOV-infected HCOs demonstrated suppression of these </span>
+<span class="rc">#same pathways&quot; (page 7)</span>
+<span class="rc">#(HCO = Human Colonic Organoids; the organoids created </span>
+<span class="rc">#by the researchers)</span>
+
+<span class="rc">#The biological interpretation is that MARV employs a </span>
+<span class="rc">#strategy of direct confrontation: since it cannot evade</span>
+<span class="rc"># detection, it allows the cell to produce interferon </span>
+<span class="rc">#and activate ISGs—though these prove insufficient to </span>
+<span class="rc">#fully block MARV replication (due to other mechanisms).</span>
+<span class="rc">#EBOV, on the other hand, uses a strategy of camouflage </span>
+<span class="rc">#and sabotage: its viral proteins block interferon </span>
+<span class="rc">#production immediately upon detection, thereby </span>
+<span class="rc">#preventing ISG activation. By suppressing this </span>
+<span class="rc">#immune alarm, EBOV buys time to replicate.</span></code></pre>
+
+
+<h2 id="s13">13. Selection of the 250 most differentially expressed host genes</h2>
+<pre class="r-source"><code><span class="rc"># select top250 de</span>
+<span class="rc"># for each gene,</span>
+<span class="rc"># we take the smalles padj among the 4 host comparisons</span>
+<span class="rc"># (EBOV/MARV x 1dpi/3dpi vs Mock) to capture genes that are strongly DE in</span>
+<span class="rc"># at least one condition, whether specific to a virus or a time point.</span>
+get_padj_df &lt;- function(res, label) {
+  df &lt;- as.data.frame(res)[, c(&quot;padj&quot;, &quot;log2FoldChange&quot;)]
+  colnames(df) &lt;- paste0(label, &quot;_&quot;, colnames(df))
+  df$gene &lt;- rownames(res)
+  df
+}
+
+padj_all &lt;- get_padj_df(res_EBOV_d1_host, &quot;EBOV_d1&quot;) %&gt;%
+  dplyr::full_join(get_padj_df(res_MARV_d1_host, &quot;MARV_d1&quot;), by = &quot;gene&quot;) %&gt;%
+  dplyr::full_join(get_padj_df(res_EBOV_d3_host, &quot;EBOV_d3&quot;), by = &quot;gene&quot;) %&gt;%
+  dplyr::full_join(get_padj_df(res_MARV_d3_host, &quot;MARV_d3&quot;), by = &quot;gene&quot;)
+
+padj_cols &lt;- grep(&quot;_padj$&quot;, colnames(padj_all))
+padj_all$min_padj &lt;- apply(padj_all[, padj_cols], 1, min, na.rm = TRUE)</code></pre>
+<pre class="r-source"><code>padj_all$min_padj[is.infinite(padj_all$min_padj)] &lt;- NA
+
+top250 &lt;- padj_all %&gt;%
+  dplyr::filter(!is.na(min_padj)) %&gt;%
+  dplyr::arrange(min_padj) %&gt;%
+  dplyr::slice_head(n = 250) %&gt;%
+  dplyr::pull(gene)
+
+length(top250)</code></pre>
+
+
+<h2 id="s14">14. Heatmap of the 250 most DE host genes</h2>
+<pre class="r-source"><code><span class="rc"># heatmap top250</span>
+vst_mat &lt;- assay(vst_data)[top250, ]
+
+<span class="rc"># Z-score per line : we look at the relative profiles of each gene between</span>
+<span class="rc"># samples (not its absolute level of expression, which varies</span>
+<span class="rc"># from one gene to another and would visually overwrite the comparisons)</span>
+vst_scaled &lt;- t(scale(t(vst_mat)))
+vst_scaled[vst_scaled &gt;  3] &lt;-  3
+vst_scaled[vst_scaled &lt; -3] &lt;- -3
+
+col_anno &lt;- data.frame(
+  Virus = coldata$virus,
+  DPI   = paste0(coldata$dpi, &quot; dpi&quot;),
+  row.names = colnames(vst_scaled)
+)
+
+ht_colors &lt;- colorRampPalette(rev(RColorBrewer::brewer.pal(11, &quot;RdBu&quot;)))(100)
+
+
+pheatmap::pheatmap(
+  vst_scaled,
+  color             = ht_colors,
+  breaks            = seq(-3, 3, length.out = 101),
+  annotation_col    = col_anno,
+  annotation_colors = list(
+    Virus = c(Mock = &quot;grey50&quot;, EBOV = &quot;#E64B8B&quot;, MARV = &quot;#7B3FA0&quot;),
+    DPI   = c(&quot;1 dpi&quot; = &quot;#1B9E77&quot;, &quot;3 dpi&quot; = &quot;#D95F02&quot;)
+  ),
+  cluster_rows      = TRUE,
+  cluster_cols      = TRUE,
+  clustering_method = &quot;ward.D2&quot;,
+  show_rownames     = FALSE,   
+  show_colnames     = TRUE,
+  fontsize          = 10,
+  border_color      = &quot;white&quot;,
+  main = &quot;Top 250 host genes DE (min padj, 4 comparisons) — Z-score VST&quot;,
+  width             = 9,
+  height            = 8,
+  filename = file.path(figures, &quot;heatmap_top250_DEG.png&quot;),
+
+)
+</code></pre>
+
+<img src="output/figures/heatmap_top250_DEG.png" width="700" />
+<pre class="r-source"><code>
+<span class="rc">#Unsupervised classification of the 250 most </span>
+<span class="rc">#differentially expressed host genes reproduces </span>
+<span class="rc">#the expected biological groupings :</span>
+<span class="rc">#Mock samples cluster together, whereas samples</span>
+<span class="rc"># collected 3 days after MARV infection </span>
+<span class="rc">#(MG-MA-28/29/30) form a distinct group characterized </span>
+<span class="rc">#by extreme overexpression—consistent with the ISG </span>
+<span class="rc">#signature identified in the volcano plot analysis </span>
+<span class="rc">#and corresponding to the ISG group in Figure 5A.</span>
+<span class="rc">#The outlier control sample at 3 days post-infection </span>
+<span class="rc">#(MG-MA-18, identified before with PCA) </span>
+<span class="rc">#also displays a distinct expression profile </span>
+<span class="rc">#for this set of genes, reinforcing its </span>
+<span class="rc">#classification as a technical artifact.</span></code></pre>
+
+<h2 id="s15">15. GO (Gene Ontology) enrichment analysis</h2>
+<pre class="r-source"><code><span class="rc">#The GO enrichment approach was used.</span>
+<span class="rc">#</span>
+<span class="rc">#GO (Gene Ontology) enrichment analysis focuses on </span>
+<span class="rc">#significantly differentially expressed genes and </span>
+<span class="rc">#provides functional annotation.</span>
+<span class="rc">#The GO database contains thousands of specific </span>
+<span class="rc">#categories. The analysis starts with my pre-filtered </span>
+<span class="rc">#lists—upregulated and downregulated genes (the same </span>
+<span class="rc">#lists used for the volcano plot)—and identifies </span>
+<span class="rc">#overrepresented functions.</span>
+
+
+
+
+
+
+<span class="rc">#GO enrichissement </span>
+<span class="rc"># prepare libraries enrichment </span>
+if (!requireNamespace(&quot;org.Hs.eg.db&quot;, quietly = TRUE))
+  BiocManager::install(&quot;org.Hs.eg.db&quot;)</code></pre>
+<pre class="r-source"><code>if (!requireNamespace(&quot;clusterProfiler&quot;, quietly = TRUE))
+  BiocManager::install(&quot;clusterProfiler&quot;)</code></pre>
+<pre class="r-source"><code>if (!requireNamespace(&quot;msigdbr&quot;, quietly = TRUE))
+  BiocManager::install(&quot;msigdbr&quot;)
+if (!requireNamespace(&quot;enrichplot&quot;, quietly = TRUE))
+  BiocManager::install(&quot;enrichplot&quot;)
+
+library(org.Hs.eg.db)</code></pre>
+<pre class="r-source"><code>library(clusterProfiler)</code></pre>
+<pre class="r-source"><code>library(msigdbr)
+library(enrichplot)</code></pre>
+<pre class="r-source"><code><span class="rc"># map symbols to entrez ids  </span>
+<span class="rc"># GO enrichment and GSEA require Entrez IDs (numbers), not symbols</span>
+<span class="rc"># We map symbols (row names of our results) to Entrez IDs</span>
+map_to_entrez &lt;- function(gene_symbols) {
+  res_map &lt;- suppressMessages(AnnotationDbi::select(
+    org.Hs.eg.db,
+    keys = gene_symbols,
+    columns = c(&quot;SYMBOL&quot;, &quot;ENTREZID&quot;),
+    keytype = &quot;SYMBOL&quot;
+  ))
+  res_map &lt;- res_map[!duplicated(res_map$SYMBOL), ]
+  setNames(res_map$ENTREZID, res_map$SYMBOL)
+}
+
+symbol_to_entrez &lt;- map_to_entrez(rownames(res_EBOV_d3_host))
+
+<span class="rc"># GO enrichment function </span>
+<span class="rc"># GO enrichment séparé pour UP et DOWN</span>
+run_go_enrichment &lt;- function(res, gene_symbol_to_entrez, contrast_label) {
+  df &lt;- as.data.frame(res)
+  df$gene &lt;- rownames(df)
+  df &lt;- df[!is.na(df$padj), ]
+
+  <span class="rc"># UP genes</span>
+  up_genes &lt;- df %&gt;%
+    dplyr::filter(padj &lt; 0.05, log2FoldChange &gt; 1) %&gt;%
+    dplyr::pull(gene)
+  up_entrez &lt;- na.omit(gene_symbol_to_entrez[up_genes])
+
+  <span class="rc"># DOWN genes</span>
+  down_genes &lt;- df %&gt;%
+    dplyr::filter(padj &lt; 0.05, log2FoldChange &lt; -1) %&gt;%
+    dplyr::pull(gene)
+  down_entrez &lt;- na.omit(gene_symbol_to_entrez[down_genes])
+
+  <span class="rc"># Universe = all tested genes</span>
+  universe_entrez &lt;- na.omit(gene_symbol_to_entrez)
+
+  cat(&quot;\n===&quot;, contrast_label, &quot;===\n&quot;)
+  cat(&quot;UP genes mapped:&quot;, length(up_entrez), &quot;\n&quot;)
+  cat(&quot;DOWN genes mapped:&quot;, length(down_entrez), &quot;\n&quot;)
+  cat(&quot;Universe:&quot;, length(universe_entrez), &quot;\n&quot;)
+
+  <span class="rc"># GO enrichment</span>
+  go_up &lt;- NULL
+  go_down &lt;- NULL
+
+  if (length(up_entrez) &gt;= 5) {
+    go_up &lt;- suppressMessages(
+      clusterProfiler::enrichGO(
+        gene = up_entrez,
+        universe = universe_entrez,
+        OrgDb = org.Hs.eg.db,
+        ont = &quot;BP&quot;,
+        pAdjustMethod = &quot;BH&quot;,
+        pvalueCutoff = 0.05,
+        qvalueCutoff = 0.20
+      )
+    )
+  }
+
+  if (length(down_entrez) &gt;= 5) {
+    go_down &lt;- suppressMessages(
+      clusterProfiler::enrichGO(
+        gene = down_entrez,
+        universe = universe_entrez,
+        OrgDb = org.Hs.eg.db,
+        ont = &quot;BP&quot;,
+        pAdjustMethod = &quot;BH&quot;,
+        pvalueCutoff = 0.05,
+        qvalueCutoff = 0.20
+      )
+    )
+  }
+
+  list(up = go_up, down = go_down)
+}
+
+go_ebov_d1 &lt;- run_go_enrichment(res_EBOV_d1_host, symbol_to_entrez, &quot;EBOV vs Mock, 1 dpi&quot;)</code></pre>
+<pre class="r-output"><code>## 
+## === EBOV vs Mock, 1 dpi ===
+## UP genes mapped: 253 
+## DOWN genes mapped: 18 
+## Universe: 15003</code></pre>
+<pre class="r-source"><code>go_marv_d1 &lt;- run_go_enrichment(res_MARV_d1_host, symbol_to_entrez, &quot;MARV vs Mock, 1 dpi&quot;)</code></pre>
+<pre class="r-output"><code>## 
+## === MARV vs Mock, 1 dpi ===
+## UP genes mapped: 118 
+## DOWN genes mapped: 14 
+## Universe: 15003</code></pre>
+<pre class="r-source"><code>go_ebov_d3 &lt;- run_go_enrichment(res_EBOV_d3_host, symbol_to_entrez, &quot;EBOV vs Mock, 3 dpi&quot;)</code></pre>
+<pre class="r-output"><code>## 
+## === EBOV vs Mock, 3 dpi ===
+## UP genes mapped: 144 
+## DOWN genes mapped: 745 
+## Universe: 15003</code></pre>
+<pre class="r-source"><code>go_marv_d3 &lt;- run_go_enrichment(res_MARV_d3_host, symbol_to_entrez, &quot;MARV vs Mock, 3 dpi&quot;)</code></pre>
+<pre class="r-output"><code>## 
+## === MARV vs Mock, 3 dpi ===
+## UP genes mapped: 191 
+## DOWN genes mapped: 802 
+## Universe: 15003</code></pre>
+<pre class="r-source"><code><span class="rc"># GO dotplots function </span>
+plot_go &lt;- function(go_obj, direction, contrast_label) {
+  if (is.null(go_obj) || nrow(go_obj@result) == 0) {
+    cat(&quot;  No enrichment for&quot;, direction, &quot;in&quot;, contrast_label, &quot;\n&quot;)
+    return(NULL)
+  }
+  
+  enrichplot::dotplot(go_obj, showCategory = 15) +
+    labs(title = paste(contrast_label, &quot;—&quot;, direction, &quot;genes&quot;)) +
+    theme_bw(base_size = 10) +
+    theme(plot.title = element_text(face = &quot;bold&quot;, size = 11),
+          axis.text.y = element_text(size = 8))
+}
+
+go_plots &lt;- list()
+go_plots$ebov_d1_up &lt;- plot_go(go_ebov_d1$up, &quot;UP&quot;, &quot;EBOV 1 dpi&quot;)
+go_plots$ebov_d1_dn &lt;- plot_go(go_ebov_d1$down, &quot;DOWN&quot;, &quot;EBOV 1 dpi&quot;)
+go_plots$marv_d1_up &lt;- plot_go(go_marv_d1$up, &quot;UP&quot;, &quot;MARV 1 dpi&quot;)
+go_plots$marv_d1_dn &lt;- plot_go(go_marv_d1$down, &quot;DOWN&quot;, &quot;MARV 1 dpi&quot;)
+go_plots$ebov_d3_up &lt;- plot_go(go_ebov_d3$up, &quot;UP&quot;, &quot;EBOV 3 dpi&quot;)
+go_plots$ebov_d3_dn &lt;- plot_go(go_ebov_d3$down, &quot;DOWN&quot;, &quot;EBOV 3 dpi&quot;)
+go_plots$marv_d3_up &lt;- plot_go(go_marv_d3$up, &quot;UP&quot;, &quot;MARV 3 dpi&quot;)
+go_plots$marv_d3_dn &lt;- plot_go(go_marv_d3$down, &quot;DOWN&quot;, &quot;MARV 3 dpi&quot;)
+
+for (name in names(go_plots)) {
+  if (!is.null(go_plots[[name]])) {
+    ggsave(file.path(figures, paste0(&quot;GO_&quot;, name, &quot;.png&quot;)), go_plots[[name]],
+           width = 10, height = 7, dpi = 300, bg = &quot;white&quot;)
+  }
+}
+</code></pre>
+
+
+<img src="output/figures/GO_ebov_d1_up.png" width="700" alt="GO plot for EBOV 1 dpi upregulated genes" />
+<img src="output/figures/GO_ebov_d1_dn.png" width="700" alt="GO plot for EBOV 1 dpi downregulated genes" />
+<img src="output/figures/GO_marv_d1_up.png" width="700" alt="GO plot for MARV 1 dpi upregulated genes" />
+<img src="output/figures/GO_marv_d1_dn.png" width="700" alt="GO plot for MARV 1 dpi downregulated genes" />
+<img src="output/figures/GO_ebov_d3_up.png" width="700" alt="GO plot for EBOV 3 dpi upregulated genes" />
+<img src="output/figures/GO_ebov_d3_dn.png" width="700" alt="GO plot for EBOV 3 dpi downregulated genes" />
+<img src="output/figures/GO_marv_d3_up.png" width="700" alt="GO plot for MARV 3 dpi upregulated genes" />
+<img src="output/figures/GO_marv_d3_dn.png" width="700" alt="GO plot for MARV 3 dpi downregulated genes" />
+
+<pre class="r-source"><code>
+<span class="rc"></span>
+
+<span class="rc">#Y-axis: the specific biological function</span>
+
+<span class="rc">#X-axis (GeneRatio): the proportion of our</span>
+<span class="rc"># upregulated (or downregulated) genes belonging to this function</span>
+
+<span class="rc">#Size: number of genes involved</span>
+
+<span class="rc">#Color : adjusted p-value (red = more significant in </span>
+<span class="rc">#these specific graphs) </span>
+<span class="rc">#When enrichment GO tests up and down regulated genes, </span>
+<span class="rc">#it compares them to thousands of GO categories. </span>
+<span class="rc">#However, when testing 10,000 categories simultaneously, </span>
+<span class="rc">#several will appear &quot;significant&quot; purely by chance </span>
+<span class="rc">#(p &lt; 0.05)—simply by accident. </span>
+
+<span class="rc">#This correction artificially increases </span>
+<span class="rc">#the p-values; only the most significant </span>
+<span class="rc">#categories will remain below the threshold</span>
+
+
+
+<span class="rc">#Analysis: </span>
+
+
+<span class="rc">#The 1 dpi data (for both MARV and EBOV) </span>
+<span class="rc">#are rather uninformative. The signal is weak and </span>
+<span class="rc">#lacks specificity. This makes sense, at 1 dpi, </span>
+<span class="rc">#the response is in its early stages and not yet </span>
+<span class="rc">#sufficiently organized to reveal a specific GO function.</span>
+<span class="rc"># Hallmark analysis might pick up more signals; here, </span>
+<span class="rc">#for EBOV 1 dpi (upregulated genes), we see &quot;small molecule</span>
+<span class="rc"># biosynthetic process,&quot; &quot;carbohydrate biosynthetic process,&quot; and </span>
+<span class="rc">#&quot;negative regulation of muscle adaptation&quot;—none of which </span>
+<span class="rc">#provide much insight.</span>
+<span class="rc">#The MARV 1 dpi (downregulated) set is completely empty; no </span>
+<span class="rc">#functions were identified among the downregulated genes.</span>
+
+<span class="rc">#In contrast, the 3 dpi data are interesting.</span>
+
+
+<span class="rc">#EBOV DOWN — Very rich, consistent with the paper&#x27;s narrative.</span>
+<span class="rc">#We see terms like : &quot;cell junction assembly,&quot;</span>
+<span class="rc"># &quot;extracellular matrix organization,&quot; </span>
+<span class="rc">#&quot;extracellular structure organization,&quot; </span>
+<span class="rc">#&quot;cilium movement,&quot; and &quot;regulation of membrane potential.&quot;</span>
+
+<span class="rc">#This is exactly the signature of epithelial </span>
+<span class="rc">#destruction mentioned in the paper: </span>
+<span class="rc">#the cells lose their junctions and their structure.</span>
+
+<span class="rc">#&quot;These findings suggest compromised absorptive function and</span>
+<span class="rc">#epithelial barrier integrity early in infection, which may underlie gastrointestinal symptoms commonly observed in filovirus</span>
+<span class="rc">#disease.&quot; (page 9, fig 5)</span>
+
+<span class="rc">#EBOV UP : </span>
+<span class="rc">#&quot;vasculature development&quot;, </span>
+<span class="rc">#&quot;blood vessel development&quot;, </span>
+<span class="rc">#&quot;response to hypoxia&quot;, </span>
+<span class="rc">#&quot;response to decreased oxygen levels&quot;, </span>
+<span class="rc">#&quot;response to glucocorticoid&quot;.</span>
+<span class="rc">#these are details on Hypoxia also mentionned in the paper. </span>
+
+
+<span class="rc">#MARV 3 dpi shows the clearest GO evidence of the entire project.</span>
+<span class="rc">#UP: &quot;response to virus&quot;, &quot;defense response to virus&quot;, </span>
+<span class="rc">#&quot;interferon-mediated signaling pathway&quot;, </span>
+<span class="rc">#&quot;response to type I interferon&quot;, </span>
+<span class="rc">#&quot;cellular response to type I interferon&quot;, </span>
+<span class="rc">#&quot;negative regulation of viral genome replication&quot;</span>
+
+<span class="rc">#p-values : 1e-14, 1e-11 — </span>
+<span class="rc">#extremely significant, with counts of 30 genes.</span>
+<span class="rc">#This is the exact functional equivalent of your </span>
+<span class="rc">#ISG cluster (MX1, IFIT1, ISG15 etc) from the volcano plot.</span>
+
+<span class="rc">#DOWN:</span>
+<span class="rc">#&quot;G protein-coupled receptor signaling&quot;, </span>
+<span class="rc">#&quot;circulatory system process&quot;, </span>
+<span class="rc">#&quot;regulation of membrane potential&quot;, </span>
+<span class="rc">#&quot;extracellular matrix organization&quot;</span>
+
+<span class="rc">#Consistent with a cell whose normal </span>
+<span class="rc">#functions are deteriorating under the </span>
+<span class="rc">#stress of infection—somewhat similar to </span>
+<span class="rc">#EBOV, but of a different nature, and </span>
+<span class="rc">#apparently less focused on cell junctions</span>
+
+
+
+<span class="rc"># We save the go results to csv files </span>
+export_go &lt;- function(go_obj, output_file, contrast_label) {
+  if (is.null(go_obj) || nrow(go_obj@result) == 0) {
+    cat(&quot;  (no significant terms)\n&quot;)
+    return(invisible(NULL))
+  }
+  
+  result_df &lt;- go_obj@result %&gt;%
+    dplyr::select(ID, Description, GeneRatio, BgRatio, pvalue, p.adjust, qvalue) %&gt;%
+    dplyr::arrange(p.adjust) %&gt;%
+    dplyr::mutate(contrast = contrast_label)
+  
+  write.csv(result_df, output_file, row.names = FALSE)
+  cat(&quot;  ✓ Saved:&quot;, output_file, 
+      &quot;(&quot;, nrow(result_df), &quot;terms )\n&quot;)
+  
+  return(invisible(result_df))
+}
+
+<span class="rc"># we export the go results </span>
+cat(&quot;\n=== Exporting GO enrichment results ===\n&quot;)</code></pre>
+
+
+<h2 id="s16">16. Export (GO and DEGs)</h2>
+<pre class="r-source"><code>go_ebov_d1_up_df &lt;- export_go(go_ebov_d1$up, 
+  file.path(tables, &quot;GO_EBOV_1dpi_UP.csv&quot;), &quot;EBOV vs Mock 1 dpi UP&quot;)</code></pre>
+<pre class="r-output"><code>##   ✓ Saved: /Users/corentinjeantils/Documents/EFREI_2026/genomics/test1/output/tables/GO_EBOV_1dpi_UP.csv ( 5206 terms )</code></pre>
+<pre class="r-source"><code>go_ebov_d1_dn_df &lt;- export_go(go_ebov_d1$down, 
+  file.path(tables, &quot;GO_EBOV_1dpi_DOWN.csv&quot;), &quot;EBOV vs Mock 1 dpi DOWN&quot;)</code></pre>
+<pre class="r-output"><code>##   ✓ Saved: /Users/corentinjeantils/Documents/EFREI_2026/genomics/test1/output/tables/GO_EBOV_1dpi_DOWN.csv ( 5206 terms )</code></pre>
+<pre class="r-source"><code>go_marv_d1_up_df &lt;- export_go(go_marv_d1$up, 
+  file.path(tables, &quot;GO_MARV_1dpi_UP.csv&quot;), &quot;MARV vs Mock 1 dpi UP&quot;)</code></pre>
+<pre class="r-output"><code>##   ✓ Saved: /Users/corentinjeantils/Documents/EFREI_2026/genomics/test1/output/tables/GO_MARV_1dpi_UP.csv ( 5206 terms )</code></pre>
+<pre class="r-source"><code>go_marv_d1_dn_df &lt;- export_go(go_marv_d1$down, 
+  file.path(tables, &quot;GO_MARV_1dpi_DOWN.csv&quot;), &quot;MARV vs Mock 1 dpi DOWN&quot;)</code></pre>
+<pre class="r-output"><code>##   ✓ Saved: /Users/corentinjeantils/Documents/EFREI_2026/genomics/test1/output/tables/GO_MARV_1dpi_DOWN.csv ( 5206 terms )</code></pre>
+<pre class="r-source"><code>go_ebov_d3_up_df &lt;- export_go(go_ebov_d3$up, 
+  file.path(tables, &quot;GO_EBOV_3dpi_UP.csv&quot;), &quot;EBOV vs Mock 3 dpi UP&quot;)</code></pre>
+<pre class="r-output"><code>##   ✓ Saved: /Users/corentinjeantils/Documents/EFREI_2026/genomics/test1/output/tables/GO_EBOV_3dpi_UP.csv ( 5206 terms )</code></pre>
+<pre class="r-source"><code>go_ebov_d3_dn_df &lt;- export_go(go_ebov_d3$down, 
+  file.path(tables, &quot;GO_EBOV_3dpi_DOWN.csv&quot;), &quot;EBOV vs Mock 3 dpi DOWN&quot;)</code></pre>
+<pre class="r-output"><code>##   ✓ Saved: /Users/corentinjeantils/Documents/EFREI_2026/genomics/test1/output/tables/GO_EBOV_3dpi_DOWN.csv ( 5206 terms )</code></pre>
+<pre class="r-source"><code>go_marv_d3_up_df &lt;- export_go(go_marv_d3$up, 
+  file.path(tables, &quot;GO_MARV_3dpi_UP.csv&quot;), &quot;MARV vs Mock 3 dpi UP&quot;)</code></pre>
+<pre class="r-output"><code>##   ✓ Saved: /Users/corentinjeantils/Documents/EFREI_2026/genomics/test1/output/tables/GO_MARV_3dpi_UP.csv ( 5206 terms )</code></pre>
+<pre class="r-source"><code>go_marv_d3_dn_df &lt;- export_go(go_marv_d3$down, 
+  file.path(tables, &quot;GO_MARV_3dpi_DOWN.csv&quot;), &quot;MARV vs Mock 3 dpi DOWN&quot;)</code></pre>
+<pre class="r-output"><code>##   ✓ Saved: /Users/corentinjeantils/Documents/EFREI_2026/genomics/test1/output/tables/GO_MARV_3dpi_DOWN.csv ( 5206 terms )</code></pre>
+<pre class="r-source"><code><span class="rc"># save degs to csv files</span>
+save_degs &lt;- function(res, contrast_label, output_file) {
+  df &lt;- as.data.frame(res) %&gt;%
+    tibble::rownames_to_column(&quot;gene_symbol&quot;) %&gt;%
+    dplyr::filter(!is.na(padj)) %&gt;%
+    dplyr::mutate(
+      direction = dplyr::case_when(
+        padj &lt; 0.05 &amp; log2FoldChange &gt;  1 ~ &quot;UP&quot;,
+        padj &lt; 0.05 &amp; log2FoldChange &lt; -1 ~ &quot;DOWN&quot;,
+        TRUE ~ &quot;NS&quot;
+      ),
+      contrast = contrast_label
+    ) %&gt;%
+    dplyr::select(gene_symbol, log2FoldChange, padj, direction, contrast) %&gt;%
+    dplyr::arrange(padj)
+  
+  write.csv(df, output_file, row.names = FALSE)
+  cat(&quot;✓&quot;, output_file, &quot;—&quot;, 
+      sum(df$direction == &quot;UP&quot;), &quot;UP |&quot;, 
+      sum(df$direction == &quot;DOWN&quot;), &quot;DOWN\n&quot;)
+}
+
+cat(&quot;\n=== Exporting DEG lists ===\n&quot;)</code></pre>
+<pre class="r-output"><code>## 
+## === Exporting DEG lists ===</code></pre>
+<pre class="r-source"><code>save_degs(res_EBOV_d1_host, &quot;EBOV vs Mock 1 dpi&quot;, 
+  file.path(tables, &quot;DEG_EBOV_1dpi.csv&quot;))</code></pre>
+<pre class="r-output"><code>## ✓ /Users/corentinjeantils/Documents/EFREI_2026/genomics/test1/output/tables/DEG_EBOV_1dpi.csv — 274 UP | 19 DOWN</code></pre>
+<pre class="r-source"><code>save_degs(res_MARV_d1_host, &quot;MARV vs Mock 1 dpi&quot;, 
+  file.path(tables, &quot;DEG_MARV_1dpi.csv&quot;))</code></pre>
+<pre class="r-output"><code>## ✓ /Users/corentinjeantils/Documents/EFREI_2026/genomics/test1/output/tables/DEG_MARV_1dpi.csv — 125 UP | 17 DOWN</code></pre>
+<pre class="r-source"><code>save_degs(res_EBOV_d3_host, &quot;EBOV vs Mock 3 dpi&quot;, 
+  file.path(tables, &quot;DEG_EBOV_3dpi.csv&quot;))</code></pre>
+<pre class="r-output"><code>## ✓ /Users/corentinjeantils/Documents/EFREI_2026/genomics/test1/output/tables/DEG_EBOV_3dpi.csv — 177 UP | 967 DOWN</code></pre>
+<pre class="r-source"><code>save_degs(res_MARV_d3_host, &quot;MARV vs Mock 3 dpi&quot;, 
+  file.path(tables, &quot;DEG_MARV_3dpi.csv&quot;))</code></pre>
+<pre class="r-output"><code>## ✓ /Users/corentinjeantils/Documents/EFREI_2026/genomics/test1/output/tables/DEG_MARV_3dpi.csv — 261 UP | 994 DOWN</code></pre>
+<h2 id="s18">Conclusion</h2>
+<pre class="r-output"><code><span class="rc"></span>
+
+<span class="rc">This project aimed to characterize the host </span>
+<span class="rc">transcriptional response in human colonic organoids </span>
+<span class="rc">(HCOs) to two filoviruses—Ebola (EBOV) and Marburg </span>
+<span class="rc">(MARV)—at 1 and 3 days post-infection, using dataset </span>
+<span class="rc">GSE300073 and a DESeq2-based analysis pipeline.</span>
+
+<span class="rc">Prior to biological interpretation, data integrity was </span>
+<span class="rc">confirmed through several checks. Viral transcript counts </span>
+<span class="rc">increased by two to three orders of magnitude between 1 and </span>
+<span class="rc">3 days post-infection (dpi), indicating active replication.</span>
+<span class="rc">One control sample (Mock) (MG-MA-18, 3 dpi) showed anomalous </span>
+<span class="rc">viral reads; </span>
+<span class="rc">PCA analysis resolved the ambiguity: its PC1 value</span>
+<span class="rc"> (−3.56) placed it clearly within the control range, while its</span>
+<span class="rc">  extreme PC2 value (+22.5) isolated it in the direction opposite</span>
+<span class="rc">to the 3 dpi EBOV group.</span>
+
+<span class="rc">A genuine infection would have shifted the sample toward </span>
+<span class="rc">the EBOV group; consequently, it was classified as technical </span>
+<span class="rc">noise rather than a true infection, a conclusion supported by </span>
+<span class="rc">the heatmap of the most differentially expressed genes, which </span>
+<span class="rc">confirmed its artifactual profile.</span>
+<span class="rc">Key results :</span>
+<span class="rc"> At 1 dpi, EBOV and MARV induced convergent </span>
+<span class="rc">responses characterized by modest upregulation, </span>
+<span class="rc">indicating that the cells did not yet distinguish between </span>
+<span class="rc">the two viruses. </span>
+<span class="rc">By 3 dpi, the responses had diverged markedly. </span>
+<span class="rc">MARV triggered a distinct interferon-stimulated gene (ISG) signature,</span>
+<span class="rc"> visible both in volcano plots and as the most significant result</span>
+<span class="rc">  of the Gene Ontology (GO) enrichment analysis.</span>
+<span class="rc">In contrast, EBOV was characterized by massive downregulation </span>
+<span class="rc">and the collapse of the initial upregulation, with GO terms </span>
+<span class="rc">indicating a loss of epithelial structure. </span>
+
+<span class="rc">Biological interpretation: </span>
+<span class="rc">These contrasting profiles reflect two distinct viral </span>
+<span class="rc">strategies. MARV adopts a direct confrontation strategy: </span>
+<span class="rc">it allows the cell to trigger its interferon response and </span>
+<span class="rc">activate interferon-stimulated genes (ISGs), which prove </span>
+<span class="rc">insufficient to completely block replication. EBOV adopts </span>
+<span class="rc">a camouflage and sabotage strategy: its viral proteins inhibit </span>
+<span class="rc">interferon production upon detection, thus preventing ISG activation</span>
+<span class="rc"> and gaining time to replicate, at the cost of widespread epithelial</span>
+<span class="rc">  dysfunction.</span>
+
+<span class="rc">The results are in close agreement with those of the study. </span>
+<span class="rc">The induction of ISGs by MARV corresponds to the strong induction</span>
+<span class="rc"> reported (notably OASL, MX1, IFIT1, IFIT2, IFI6, and CXCL10; </span>
+<span class="rc"> p. 9, Fig. 5B), several of which (MX1, IFIT1, IFI6, OAS3) </span>
+<span class="rc"> were found here.</span>
+
+<span class="rc">The inhibition of these same pathways by EBOV is consistent </span>
+<span class="rc">with the data on page 7, and the GO signature associated with</span>
+<span class="rc"> epithelial disruption echoes the link established in the </span>
+<span class="rc"> article between EBOV infection, impaired barrier integrity, </span>
+<span class="rc"> and gastrointestinal symptoms.</span>
+
+<span class="rc">Limitations. The absolute numbers of differentially expressed </span>
+<span class="rc">genes (DEGs) differ somewhat from the published figures, </span>
+<span class="rc">which is expected: the article relied on edgeR and limma, </span>
+<span class="rc">while this pipeline used DESeq2, as these two approaches </span>
+<span class="rc">employ different normalization and thresholding methods.</span>
+
+<span class="rc">The counts also varied depending on the log2FC threshold applied.</span>
+
+
+<span class="rc">I could have performed a GSEA (Gene Set Enrichment Analysis) </span>
+<span class="rc">on the DESeq2 results. </span>
+<span class="rc">GSEA is based on &quot;Hallmark&quot; gene sets and is performed </span>
+<span class="rc">on the complete, ranked list of genes.</span>
+<span class="rc">It utilizes a Hallmark database containing only around </span>
+<span class="rc">fifty broader categories and incorporates *all* genes, </span>
+<span class="rc">ranked from most upregulated to most downregulated </span>
+<span class="rc">(without applying a significance threshold).</span>
+<span class="rc">Even if individual genes within a pathway are not </span>
+<span class="rc">statistically significant on their own, GSEA detects </span>
+<span class="rc">the signal if they collectively show a slight shift </span>
+<span class="rc">toward upregulation. </span>
+<span class="rc"></span>
+<span class="rc">This makes GSEA more powerful </span>
+<span class="rc">in this context, but was not performed as part of this analysis.</span>
+
+
+
+<span class="rc">In summary, despite methodological differences, </span>
+<span class="rc">the pipeline reproduced the study&#x27;s central biological </span>
+<span class="rc">conclusion: EBOV and MARV induce fundamentally opposing </span>
+<span class="rc">immune dynamics in colonic organoids—interferon-mediated</span>
+<span class="rc"> defense for MARV versus immunosuppression and epithelial </span>
+<span class="rc">alteration for EBOV.</span></code></pre>
+
+
+</div>
+</body>
+</html>
