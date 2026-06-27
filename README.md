@@ -1,7 +1,7 @@
 # JEANTILS-CORENTIN-GSE300073
 Pipeline DESeq2 applied to the dataset GSE300073 (infection of the human colonic organoids by the filoviruses Ebola and Marburg)
 
-
+I am trying to reproduce the study's results using the dataset (without of course generating human mini-intestines) and to study the interactions of these viruses with intestinal epithelial cells.
 The pipeline.R script performs the analysis.
 The report.html file is simply the R script compiled into HTML via RStudio, with some modifications (such as a table of contents and properly embedded images).
 Consequently, the analysis details can be found in the code comments within both pipeline.R and the .html file.
